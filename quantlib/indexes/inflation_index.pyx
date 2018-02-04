@@ -6,6 +6,8 @@
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 """
+from quantlib.indexes.inflation_index import ZeroInflationIndex
+from quantlib.currency.currencies import GBPCurrency
 
 include '../types.pxi'
 
@@ -15,21 +17,24 @@ from quantlib.handle cimport Handle, shared_ptr
 from libcpp cimport bool
 from libcpp.string cimport string
 
-from quantlib.index cimport Index
-from quantlib.time.date cimport Period, period_from_qlperiod
-from quantlib.time._period cimport Frequency, Months
-from quantlib.indexes.region cimport Region
-from quantlib.currency.currency cimport Currency
-from quantlib.termstructures.inflation_term_structure cimport \
-    ZeroInflationTermStructure
-
 cimport quantlib._index as _in
 cimport quantlib.indexes._inflation_index as _ii
 cimport quantlib.termstructures._inflation_term_structure as _its
 cimport quantlib._interest_rate as _ir
+cimport quantlib.time._period as _pe
+from quantlib.time._period cimport Frequency, Months
 
-from quantlib.currency.api import AUDCurrency
-from quantlib.indexes.regions import AustraliaRegion
+from quantlib.time.frequency cimport Monthly
+from quantlib.index cimport Index
+from quantlib.time.date cimport Period, period_from_qlperiod
+from quantlib.indexes.region cimport Region
+from quantlib.currency.currency cimport Currency
+from quantlib.termstructures.inflation_term_structure cimport \
+    ZeroInflationTermStructure, YoYInflationTermStructure
+
+
+from quantlib.currency.api import AUDCurrency, GBPCurrency
+from quantlib.indexes.regions import AustraliaRegion, UKRegion
 
 cimport quantlib.currency._currency as _cu
 from quantlib.currency.currency cimport Currency
@@ -81,12 +86,44 @@ cdef class ZeroInflationIndex(InflationIndex):
         # convert the Python str to C++ string
         cdef string c_family_name = family_name.encode('utf-8')
 
-        self._thisptr = shared_ptr[_in.Index](
+        self._thisptr = new shared_ptr[_in.Index](
             new _ii.ZeroInflationIndex(
                 c_family_name,
                 deref(region._thisptr),
                 revised,
                 interpolated,
+                <_ir.Frequency> frequency,
+                deref(availabilityLag._thisptr.get()),
+                deref(currency._thisptr),
+                ts_handle))
+
+cdef class YoYInflationIndex(InflationIndex):
+    def __init__(self, str family_name,
+                 Region region,
+                 bool revised,
+                 bool interpolated,
+                 bool ratio,
+                 Frequency frequency,
+                 Period availabilityLag,
+                 Currency currency,
+                 YoYInflationTermStructure ts=None):
+
+        cdef Handle[_its.YoYInflationTermStructure] ts_handle
+        if ts is None:
+            ts_handle = Handle[_its.YoYInflationTermStructure]()
+        else:
+            ts_handle = deref(<Handle[_its.YoYInflationTermStructure]*>ts._thisptr.get())
+
+        # convert the Python str to C++ string
+        cdef string c_family_name = family_name.encode('utf-8')
+
+        self._thisptr = new shared_ptr[_in.Index](
+            new _ii.YoYInflationIndex(
+                c_family_name,
+                deref(region._thisptr),
+                revised,
+                interpolated,
+                ratio,
                 <_ir.Frequency> frequency,
                 deref(availabilityLag._thisptr.get()),
                 deref(currency._thisptr),
@@ -98,7 +135,32 @@ cdef class AUCPI(ZeroInflationIndex):
                  bool revised,
                  interpolated,
                  ZeroInflationTermStructure ts=None):
-
+        
         super().__init__("CPI", AustraliaRegion(), revised,
                          interpolated, frequency, Period(2, Months),
                          AUDCurrency(), ts)
+        
+cdef class UKRPI(ZeroInflationIndex):
+    """
+    UK Retail Price Inflation Index
+    """
+    def __init__(self, bool interpolated,
+                 ZeroInflationTermStructure ts=None):
+        
+        super().__init__("RPI", UKRegion(), False, interpolated,
+                         Monthly, Period(1, Months),
+                         GBPCurrency(), ts)
+        
+cdef class YYUKRPI(YoYInflationIndex):
+    """
+    Genuine year-on-year UK RPI (i.e. not a ratio of UK RPI)
+    """
+    def __init__(self, bool interpolated,
+                 YoYInflationTermStructure ts=None):
+        
+        super().__init__("YY_RPI", UKRegion(), False, interpolated,
+                         False, Monthly, Period(1, Months),
+                         GBPCurrency(), ts)
+        
+
+        

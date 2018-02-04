@@ -15,14 +15,16 @@ cimport _instrument
 
 cimport quantlib.indexes._ibor_index as _ib
 cimport quantlib.indexes._inflation_index as _ii
+cimport quantlib.time._businessdayconvention as _bc
 
 from cython.operator cimport dereference as deref
 from libcpp cimport bool
 
 from quantlib.handle cimport shared_ptr
-from quantlib.time._businessdayconvention cimport BusinessDayConvention
 from quantlib.time.schedule cimport Schedule
 from quantlib.time.daycounter cimport DayCounter
+from quantlib.time._businessdayconvention cimport ModifiedFollowing, BusinessDayConvention
+from quantlib.time._calendar cimport BusinessDayConvention
 from quantlib.time.date cimport Period
 from quantlib.indexes.ibor_index cimport IborIndex
 from quantlib.indexes.inflation_index cimport ZeroInflationIndex
@@ -31,7 +33,7 @@ cpdef public enum CPISwapType:
     Payer    = _cpiswap.Payer
     Receiver = _cpiswap.Receiver
     
-cpdef public enum CPIInterpolationType:
+cpdef public enum InterpolationType:
     AsIndex = _cpiswap.AsIndex
     Flat    = _cpiswap.Flat
     Linear  = _cpiswap.Linear
@@ -65,7 +67,7 @@ cdef class CPISwap(Swap):
                 BusinessDayConvention fixed_roll,
                 Period observation_lag,
                 ZeroInflationIndex fixed_index,
-                CPIInterpolationType observation_interpolation,
+                InterpolationType observation_interpolation,
                 Real inflation_nominal):
     
         self._thisptr = new shared_ptr[_instrument.Instrument](

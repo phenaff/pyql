@@ -160,7 +160,7 @@ class FixedIncomeMarket(Market):
     A Fixed Income Market, defined by:
     - a list of benchmarks instruments (deposits, FRA, swaps,
       EuroDollar futures, bonds)
-    - a set of market conventions, needed to interpreted the quoted
+    - a set of market conventions, needed to interpret the quoted
       prices of benchmark instruments, and for computing
       derived quantities (yield curves)
 
@@ -322,7 +322,8 @@ class IborMarket(FixedIncomeMarket):
         # must be a business day
         settlement_date = calendar.adjust(settlement_date)
         ts = PiecewiseYieldCurve.from_reference_date(
-            BootstrapTrait.Discount, interpolator, settlement_date, self._rate_helpers,
+            BootstrapTrait.Discount, interpolator, settlement_date, 
+            self._rate_helpers,
             DayCounter.from_name(self._termstructure_daycount),
             tolerance
         )

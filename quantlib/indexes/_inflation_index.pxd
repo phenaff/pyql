@@ -11,6 +11,8 @@ include '../types.pxi'
 from libcpp cimport bool
 from libcpp.string cimport string
 
+from quantlib.handle cimport Handle, shared_ptr
+
 from quantlib._index cimport Index
 from quantlib.currency._currency cimport Currency
 from quantlib.indexes._region cimport Region
@@ -51,3 +53,13 @@ cdef extern from 'ql/indexes/inflationindex.hpp' namespace 'QuantLib':
                   Handle[_its.ZeroInflationTermStructure]& h) except +
 
         
+    cdef cppclass YoYInflationIndex(InflationIndex):
+        YoYInflationIndex(string& family_name,
+                     Region& region,
+                     bool revised,
+                     bool interpolated,
+                     bool ratio,
+                     Frequency frequency,
+                     Period& availabilityLag,
+                     Currency& currency,
+                     Handle[_its.YoYInflationTermStructure]& h) except +

@@ -42,7 +42,7 @@ cdef extern from 'ql/instruments/cpiswap.hpp' namespace 'QuantLib::CPISwap':
         Payer
     
 
-cdef extern from 'ql/instruments/cpiswap.hpp' namespace 'Quantlib':
+cdef extern from 'ql/instruments/cpiswap.hpp' namespace 'QuantLib':
     cdef cppclass CPISwap(Swap):
     
         CPISwap(Type type,

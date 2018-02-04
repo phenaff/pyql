@@ -1,4 +1,4 @@
-""" Simple example pricing a European option 
+""" Simple example pricing a European option
 using a Black&Scholes Merton process."""
 from __future__ import print_function
 
@@ -19,7 +19,7 @@ calendar = TARGET()
 offset = 366
 
 todays_date = today() - offset
-settlement_date = todays_date + 2
+settlement_date = todays_date +2
 
 settings.evaluation_date = todays_date
 

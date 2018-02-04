@@ -6,6 +6,16 @@ cdef class InflationIndex(Index):
 cdef class ZeroInflationIndex(InflationIndex):
     pass
 
+cdef class YoYInflationIndex(InflationIndex):
+    pass
+
 cdef class AUCPI(ZeroInflationIndex):
     pass
+
+cdef class UKRPI(ZeroInflationIndex):
+    pass
+
+cdef class YYUKRPI(YoYInflationIndex):
+    pass
+
 
