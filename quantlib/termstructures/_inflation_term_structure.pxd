@@ -10,6 +10,7 @@
 include '../types.pxi'
 
 from libcpp cimport bool
+from libcpp.pair cimport pair
 
 from quantlib.handle cimport shared_ptr, Handle
 from quantlib.time._date cimport Date
@@ -70,4 +71,12 @@ cdef extern from 'ql/termstructures/inflationtermstructure.hpp' namespace 'Quant
                       bool extrapolate) except +
         
 
-        # TODO: add more methods and inspectors
+    cdef pair[Date, Date] inflationPeriod(Date& d, Frequency frequency)
+
+    cdef double inflationYearFraction(Frequency frequency,
+                               bool indexIsInterpolated,
+                               DayCounter& dayCounter,
+                               Date& d1,
+                               Date& d2)
+
+            # TODO: add more methods and inspectors

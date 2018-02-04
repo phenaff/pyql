@@ -6,6 +6,7 @@ from quantlib.time.businessdayconvention import Following, Preceding
 from quantlib.time.calendars.united_kingdom import UnitedKingdom
 from quantlib.time.schedule import Schedule, Twentieth, Forward, Backward
 
+
 class ScheduleTestCase(unittest.TestCase):
 
     def test_create_schedule(self):
@@ -19,7 +20,8 @@ class ScheduleTestCase(unittest.TestCase):
         rule = Forward
 
         schedule = Schedule(
-            from_date, to_date, tenor, calendar, convention, termination_convention, rule
+            from_date, to_date, tenor, calendar, convention,
+            termination_convention, rule
         )
 
         self.assertIsNotNone(schedule)
@@ -64,7 +66,7 @@ class ScheduleMethodTestCase(unittest.TestCase):
     def test_iter_dates(self):
 
         expected_dates_length = self.schedule.size()
-        dates= [date for date in self.schedule]
+        dates = [date for date in self.schedule]
 
         self.assertEqual(expected_dates_length, len(dates))
 
@@ -126,6 +128,7 @@ class ScheduleMethodTestCase(unittest.TestCase):
 
         expected_date = Date(15, Dec, 2011)
         self.assert_(expected_date == schedule.next_date(Date(6, Nov, 2011)))
+
 
 if __name__ == '__main__':
     unittest.main()

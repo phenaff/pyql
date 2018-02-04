@@ -8,6 +8,7 @@
 include '../types.pxi'
 
 from libcpp cimport bool
+from libcpp.utility cimport pair
 
 cimport quantlib.time._date as _date
 from quantlib.time.date cimport Date, Period, date_from_qldate
@@ -151,3 +152,24 @@ cdef class YoYInflationTermStructure(InflationTermStructure):
         cdef _if.YoYInflationTermStructure* term_structure = \
           <_if.YoYInflationTermStructure*>self._get_term_structure()
         return term_structure.yoyRate(t, extrapolate)
+
+
+cpdef list inflation_period(Date d, Frequency frequency):
+
+    cdef pair[_date.Date, _date.Date] res
+    
+    res = _if.inflationPeriod(deref(d._thisptr.get()),
+        <_ir.Frequency> frequency)
+
+    return [date_from_qldate(res.first), date_from_qldate(res.second)]
+
+cdef Time inflation_year_fraction(Frequency f, bool index_is_interpolated,
+                               DayCounter day_counter,
+                               Date d1, Date d2):
+    cdef Time t
+    t = _if.inflationYearFraction(<_ir.Frequency> f,
+        index_is_interpolated,
+        deref(day_counter._thisptr),
+        deref(d1._thisptr.get()),
+        deref(d2._thisptr.get()))
+    return t
