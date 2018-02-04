@@ -48,8 +48,8 @@ cdef extern from 'ql/termstructures/inflation/inflationhelpers.hpp' namespace 'Q
         void setTermStructure(ZeroInflationTermStructure*) except +
         Real impliedQuote() 
 
-    cdef cppclass YoYInflationSwapHelper(YoYInflationHelper):
-        YoYInflationSwapHelper(
+    cdef cppclass YearOnYearInflationSwapHelper(YoYInflationHelper):
+        YearOnYearInflationSwapHelper(
             Handle[Quote]& quote,
             Period& swapObsLag,
             Date& maturity,
