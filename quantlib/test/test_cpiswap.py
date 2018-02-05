@@ -10,7 +10,7 @@ from quantlib.termstructures.yields.api import (
     FlatForward, YieldTermStructure
 )
 from quantlib.time.api import (
-    Unadjusted, ModifiedFollowing, Date, Days, 
+    Unadjusted, ModifiedFollowing, Date, Days,
     November, December, February, March, May, September, June,
     Period,
     Annual, Years, Months, Actual365Fixed, Thirty360, TARGET, Actual360,
@@ -26,10 +26,32 @@ class TestQuantLibCPISwap(unittest.TestCase):
 
     def setup(selfself):
 
+        # UK RPI index fixing data
+                evaluation_date = Date(13, August, 2007)
+        evaluation_date = UnitedKingdom().adjust(evaluation_date)
+
+        settings = Settings()
+        settings.evaluation_date = evaluation_date
+
+        from_date = Date(20, July, 2007)
+        to_date = Date(20, November, 2009)
+        rpi_schedule = Schedule(from_date, to_date, Period(1, Months),
+            UnitedKingdom(), ModifiedFollowing)
+
+        fix_data = [206.1, 207.3, 208.0, 208.9, 209.7, 210.9,
+                209.8, 211.4, 212.1, 214.0, 215.1, 216.8,
+                216.5, 217.2, 218.4, 217.7, 216,
+                212.9, 210.1, 211.4, 211.3, 211.5,
+                212.8, 213.4, 213.4, 213.4, 214.4,
+                -999.0, -999.0]
+
+        ii = UKRPI(False)
+        for dt, fix in zip(rpi_schedule, fix_data):
+            ii.add_fixing(dt, fix, True)
+
         # nominal term structure
-        
-        
-        nominalData = [[ Date(26, November, 2009), 0.475 ],
+
+        nominalData = [[Date(26, November, 2009), 0.475 ],
                 [ Date(2, December, 2009), 0.47498 ],
                 [ Date(29, December, 2009), 0.49988 ],
                 [ Date(25, February, 2010), 0.59955 ],
@@ -62,43 +84,41 @@ class TestQuantLibCPISwap(unittest.TestCase):
 
             nomD = [x[0] for x in nominalData]
             nomR = [x[1] for x in nominalData]
-            
+
             nominalTS = YieldTermStructure(relinkable=True)
-            nominalTS.link_to(ZeroCurve(nomD,nomR,dcNominal))
+            nominalTS.link_to(ZeroCurve(nomD, nomR, dcNominal))
 
+            nominalTS.linkTo(nominal)
 
-            nominalTS.linkTo(nominal);
-
-        
     def test_cpiswap_consistency(self):
         """
         Translated from QL inflationcpiswap.cpp
         Check inflation leg vs calculation directly from inflation TS
         """
 
-    type = Payer
-    nominal = 1000000.0
-    subtractInflationNominal = True
-    # float+spread leg
-    spread = 0.0
-    floatDayCount = Actual365Fixed()
-    floatPaymentConvention = ModifiedFollowing
-    fixingDays = 0
-    float_index = Libor('GBP Libor', Period(6,Months),
-                        settlement_days, GBPCurrency(),
-                        TARGET(), Actual360(), termStructure)
-    
+        type = Payer
+        nominal = 1000000.0
+        subtractInflationNominal = True
+        # float+spread leg
+        spread = 0.0
+        floatDayCount = Actual365Fixed()
+        floatPaymentConvention = ModifiedFollowing
+        fixingDays = 0
+        float_index = Libor('GBP Libor', Period(6, Months),
+                            settlement_days, GBPCurrency(),
+                            TARGET(), Actual360(), termStructure)
+
     # fixed x inflation leg
     fixedRate = 0.1     # 105
     baseCPI = 206.1     # would be 206.13871 if we were interpolating
     fixedDayCount = Actual365Fixed()
     fixedPaymentConvention = ModifiedFollowing
     paymentCalendar = UnitedKingdom()
-    
-# link from cpi index to cpi TS
-interp = False      # this MUST be false because the observation lag is only 2 months
+   
+    # link from cpi index to cpi TS
+    interp = False      # this MUST be false because the observation lag is only 2 months
                     # for ZCIIS; but not for contract if the contract uses a bigger lag.
-     ii = boost::shared_ptr<UKRPI>(new UKRPI(interp, hcpi));
+     ii = UKRPI(interp, hcpi)
 for (Size i=0; i<rpiSchedule.size();i++) {
     ii->addFixing(rpiSchedule[i], fixData[i], true);// force overwrite in case multiple use
 };
