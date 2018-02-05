@@ -163,7 +163,7 @@ cpdef list inflation_period(Date d, Frequency frequency):
 
     return [date_from_qldate(res.first), date_from_qldate(res.second)]
 
-cdef Time inflation_year_fraction(Frequency f, bool index_is_interpolated,
+cpdef Time inflation_year_fraction(Frequency f, bool index_is_interpolated,
                                DayCounter day_counter,
                                Date d1, Date d2):
     cdef Time t

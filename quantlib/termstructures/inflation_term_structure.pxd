@@ -22,9 +22,8 @@ cdef class YoYInflationTermStructure(InflationTermStructure):
 
 cpdef list inflation_period(Date date, Frequency f)
 
-# cdef double inflation_year_fraction(Frequency f, 
-#                              bool index_is_interpolated,
-#                              DayCounter day_counter,
-#                              Date d1,
-#                              Date d2):
-#     pass
+cpdef double inflation_year_fraction(Frequency f, 
+                             bool index_is_interpolated,
+                             DayCounter day_counter,
+                             Date d1,
+                             Date d2)
