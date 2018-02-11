@@ -33,7 +33,6 @@ from quantlib.termstructures.inflation.seasonality cimport Seasonality
 
 cdef class InflationTermStructure:
     """Abstract Base Class.
-    """
     def __cinit__(self):
         self.relinkable = False
         self._thisptr = NULL
@@ -51,8 +50,14 @@ cdef class InflationTermStructure:
             self._thisptr = new shared_ptr[Handle[_if.InflationTermStructure]](
                 new Handle[_if.InflationTermStructure]()
             )
-
+    """
+            
     def link_to(self, InflationTermStructure structure):
+        if structure._thisptr.empty():
+            raise ValueError('Inflation term structure not initialized')
+        self._thisptr.linkTo(structure._thisptr.currentLink())
+
+        """
         cdef RelinkableHandle[_if.InflationTermStructure]* rh
         if not self.relinkable:
             raise ValueError('Non relinkable inflation term structure !')
@@ -63,43 +68,34 @@ cdef class InflationTermStructure:
             )
 
         return
+        """
 
-    cdef _if.InflationTermStructure* _get_term_structure(self):
+    cdef inline _if.InflationTermStructure* _get_term_structure(self) except NULL:
 
-        cdef _if.InflationTermStructure* term_structure
-        cdef shared_ptr[_if.InflationTermStructure] ts_ptr
-        ts_ptr = shared_ptr[_if.InflationTermStructure](
-                self._thisptr.get().currentLink()
-        )
-        term_structure = ts_ptr.get()
+        if self._thisptr.empty():
+            raise ValueError('Inflation term structure not initialized')
+        return self._thisptr.currentLink().get()
 
-        if term_structure is NULL:
-            raise ValueError('Inflation term structure not intialized')
-
-        return term_structure
-
+    """
     cdef _is_empty(self):
 
-        return self._thisptr.get().empty()
+        cdef _if.InflationTermStructure* term_structure = self._get_term_structure()
+        cdef _yts.Date ref_date = term_structure.referenceDate()
+        return term_structure.empty()
 
     cdef _raise_if_empty(self):
         # verify that the handle is not empty. We could add an except + on the
         # definition of the currentLink() method but it creates more trouble on
         # the code generation with Cython than what it solves
         if self._is_empty():
-            raise ValueError('Empty handle to the inflation term structure')
-        
-    def __dealloc__(self):
-        if self._thisptr is not NULL:
-            del self._thisptr
+            raise ValueError('Empty handle to the inflation term structure')        
+    """
 
-    property max_date:
-        def __get__(self):
-            self._raise_if_empty()
-            cdef _if.InflationTermStructure* term_structure = \
-              self._get_term_structure()
-            cdef _date.Date max_date = term_structure.maxDate()
-            return date_from_qldate(max_date)
+    @property 
+    def max_date(self):
+        cdef _if.InflationTermStructure* term_structure = self._get_term_structure()
+        cdef _date.Date max_date = term_structure.maxDate()
+        return date_from_qldate(max_date)
 
         
 cdef class ZeroInflationTermStructure(InflationTermStructure):

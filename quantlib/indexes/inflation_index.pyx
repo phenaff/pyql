@@ -66,6 +66,17 @@ cdef class InflationIndex(Index):
             cdef _cu.Currency c = ref.currency()
             return Currency.from_name(c.code())
 
+    property interpolated:
+        def __get__(self):
+            cdef _ii.InflationIndex* ref = <_ii.InflationIndex*>self._thisptr.get()
+            cdef bool interpolated = ref.interpolated()
+            return interpolated            
+
+    property revised:
+        def __get__(self):
+            cdef _ii.InflationIndex* ref = <_ii.InflationIndex*>self._thisptr.get()
+            cdef bool revised = ref.revised()
+            return revised            
 
 cdef class ZeroInflationIndex(InflationIndex):
     def __init__(self, str family_name,
@@ -76,17 +87,14 @@ cdef class ZeroInflationIndex(InflationIndex):
                  Period availabilityLag,
                  Currency currency,
                  ZeroInflationTermStructure ts=None):
-
-        cdef Handle[_its.ZeroInflationTermStructure] ts_handle
-        if ts is None:
-            ts_handle = Handle[_its.ZeroInflationTermStructure]()
-        else:
-            ts_handle = deref(<Handle[_its.ZeroInflationTermStructure]*>ts._thisptr.get())
+        
+        cdef Handle[_its.ZeroInflationTermStructure] ts_handle = \
+           deref(<Handle[_its.ZeroInflationTermStructure]*>ts._get_term_structure())
 
         # convert the Python str to C++ string
         cdef string c_family_name = family_name.encode('utf-8')
 
-        self._thisptr = new shared_ptr[_in.Index](
+        self._thisptr = shared_ptr[_in.Index](
             new _ii.ZeroInflationIndex(
                 c_family_name,
                 deref(region._thisptr),
@@ -112,12 +120,12 @@ cdef class YoYInflationIndex(InflationIndex):
         if ts is None:
             ts_handle = Handle[_its.YoYInflationTermStructure]()
         else:
-            ts_handle = deref(<Handle[_its.YoYInflationTermStructure]*>ts._thisptr.get())
+            ts_handle = deref(<Handle[_its.YoYInflationTermStructure]*>ts._get_term_structure())
 
         # convert the Python str to C++ string
         cdef string c_family_name = family_name.encode('utf-8')
 
-        self._thisptr = new shared_ptr[_in.Index](
+        self._thisptr = shared_ptr[_in.Index](
             new _ii.YoYInflationIndex(
                 c_family_name,
                 deref(region._thisptr),

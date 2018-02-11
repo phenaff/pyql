@@ -33,7 +33,7 @@ settlementDays = 0
 fixingDays = 0
 settlement = calendar.advance(today, settlementDays, Days)
 startDate = settlement
-dcZCIIS = ActualActual()
+daycount_ZCIIS = ActualActual()
 dcNominal = ActualActual()
 
 from_date = Date(20, July, 2007)
@@ -48,10 +48,9 @@ fix_data = [206.1, 207.3, 208.0, 208.9, 209.7, 210.9,
         212.8, 213.4, 213.4, 213.4, 214.4,
         -999.0, -999.0]
 
-ii = UKRPI(False)
+inflation_index = UKRPI(False)
 for dt, fix in zip(rpi_schedule, fix_data):
-    ii.add_fixing(dt, fix, True)
-
+    inflation_index.add_fixing(dt, fix, True)
 
 nominalData = [[Date(26, November, 2009), 0.475],
         [Date(2, December, 2009), 0.47498],
@@ -88,18 +87,18 @@ nomD = [x[0] for x in nominalData]
 nomR = [x[1] / 100. for x in nominalData]
 
 dcNominal = Actual360()
-nominalTS = YieldTermStructure(relinkable=True)
+nominal_TS = YieldTermStructure(relinkable=True)
 
 # ZeroCurve is InterpolatedZeroCurve<Linear>
 nominal = ZeroCurve(nomD, nomR, dcNominal)
-nominalTS.link_to(nominal)
+nominal_TS.link_to(nominal)
 
 r = nominalTS.zero_rate(Date(10, 5, 2017), Actual360(), 2)
 print r
 
-observationLag = Period(2, Months)
-contractObservationLag = Period(3, Months)
-contractObservationInterpolation = Flat
+observation_lag = Period(2, Months)
+contract_observation_lag = Period(3, Months)
+contract_observation_interpolation = Flat
 
 zciisData = [[Date(25, November, 2010), 3.0495],
     [Date(25, November, 2011), 2.93],
@@ -140,13 +139,15 @@ for i in range(len(zciisR)):
 
 baseZeroRate = zciisR[0]/100.0
 
-boost::shared_ptr<PiecewiseZeroInflationCurve<Linear> > pCPIts(
-                    new PiecewiseZeroInflationCurve<Linear>(
-                        evaluationDate, calendar, dcZCIIS, observationLag,
-                        ii->frequency(),ii->interpolated(), baseZeroRate,
-                        Handle<YieldTermStructure>(nominalTS), helpers));
-pCPIts->recalculate();
-cpiTS = boost::dynamic_pointer_cast<ZeroInflationTermStructure>(pCPIts);
+CPI_zero_curve = PiecewiseZeroInflationCurve(Linear,
+    evaluationDate, calendar, daycount_ZCIIS, observation_lag,
+                        inflation_index.frequency,
+                        inflation_index.interpolated, baseZeroRate,
+                        nominal_TS, helpers)
+
+CPI_zero_curve.recalculate();
+
+// cpiTS = boost::dynamic_pointer_cast<ZeroInflationTermStructure>(pCPIts);
 
 
 // make sure that the index has the latest zero inflation term structure
@@ -157,46 +158,46 @@ nominal = 1000000.0
 subtractInflationNominal = True
     # float+spread leg
 spread = 0.0
-floatDayCount = Actual365Fixed()
-floatPaymentConvention = ModifiedFollowing
-fixingDays = 0
+float_daycount = Actual365Fixed()
+float_payment_convention = ModifiedFollowing
+fixing_days = 0
 float_index = Libor('GBP Libor', Period(6,Months),
                     settlement_days, GBPCurrency(),
                     TARGET(), Actual360(), nominalTS)
     
 # fixed x inflation leg
-fixedRate = 0.1     # 105
-baseCPI = 206.1     # would be 206.13871 if we were interpolating
-fixedDayCount = Actual365Fixed()
-fixedPaymentConvention = ModifiedFollowing
-paymentCalendar = UnitedKingdom()
+fixed_rate = 0.1     # 105
+base_CPI = 206.1     # would be 206.13871 if we were interpolating
+fixed_daycount = Actual365Fixed()
+fixed_payment_convention = ModifiedFollowing
+payment_calendar = UnitedKingdom()
 
-fixedIndex = UKRPI(False, common.ii;
-contractObservationLag = common.contractObservationLag;
+fixed_index = UKRPI(False, common.ii;
+contract_observation_lag = common.contractObservationLag;
 observationInterpolation = common.contractObservationInterpolation;
 
-    # set the schedules
-startDate = Date(2, October, 2007)
-endDate = Date(2, October, 2052)
-floatSchedule = Schedule(startDate,
-                         endDate,
+    # set swap schedules
+start_date = Date(2, October, 2007)
+end_date = Date(2, October, 2052)
+floatSchedule = Schedule(start_date,
+                         end_date,
                          Period(6,Months),
-                         paymentCalendar,
-                         floatPaymentConvention,
-                         floatPaymentConvention,
+                         payment_calendar,
+                         float_payment_convention,
+                         float_payment_convention,
                          Backward, False)
 
-fixedSchedule = Schedule(startDate,
-                         endDate,
+fixedSchedule = Schedule(start_date,
+                         end_date,
                          Period(6,Months),
-                         paymentCalendar,
+                         payment_calendar,
                          Unadjusted,
                          Unadjusted,
                          Backward, False)
 
 
 
-zisV = CPISwap(type, nominal, subtractInflationNominal,
+zi_swap = CPISwap(type, nominal, subtractInflationNominal,
              spread, floatDayCount, floatSchedule,
              floatPaymentConvention, fixingDays, floatIndex,
              fixedRate, baseCPI, fixedDayCount, fixedSchedule,
@@ -210,37 +211,30 @@ cpiFix = [211.4,217.2,211.4,213.4,-2,-2]
 
 for float_F, cpi_F in zip(floatFix, cpiFix):
     if (floatSchedule[i] < common.evaluationDate): 
-        floatIndex.add_fixing(floatSchedule[i], float_F,True) #//true=overwrite
+        floatIndex.add_fixing(floatSchedule[i], float_F,True)
+         # true=overwrite
 
-    """
-            boost::shared_ptr<CPICoupon>
-    zic = boost::dynamic_pointer_cast<CPICoupon>(zisV.cpiLeg()[i]);
-    if (zic) {
-        if (zic->fixingDate() < (common.evaluationDate - Period(1,Months))) {
-            fixedIndex->addFixing(zic->fixingDate(), cpiFix[i],true);
-        }
-    }
-    """
-    zic = zisV.cpiLeg()[i]
-    if zic:
-        if (zic.fixing_date < (common.evaluationDate - Period(1,Months))): 
-            fixedIndex.add_fixing(zic.fixing_date, cpi_Fix,True)
+        zi_coupon = zi_swap.cpiLeg[i]
+        if (zic is not None):
+            if (zic.fixing_date < (evaluation_date - Period(1,Months))):
+                fixed_index.add_fixing(zic.fixing_date, cpiFix[i], True);
 
 # simple structure so simple pricing engine - most work done by index
 engine = DiscountingSwapEngine(termStructure, False, settlement_date,
                                settlement_date)
 
-zisV.setPricingEngine(engine)
+zi_swap.setPricingEngine(engine)
 
 # get float+spread & fixed*inflation leg prices separately
-testInfLegNPV = 0.0
-for inf_coupon, cpi_coupon in zip(zisV.float_leg, zisV.cpi_leg):
-    zicPayDate = inf_coupon.date
-    if zicPayDate > asofDate:
-        testInfLegNPV += inf_coupon.amount * discount(zicPayDate)
+InfLegNPV = 0.0
+
+for inf_coupon, cpi_coupon in zip(zi_swap.float_leg, zi_swap.cpi_leg):
+    zi_swap_pay_date = inf_coupon.date
+    if zi_swap_pay_date > as_of_date:
+        InfLegNPV += inf_coupon.amount * discount(zi_swap_pay_date)
     
 
-    diff = fabs( zicV.rate - (fixedRate*(zicV.index_fixing/baseCPI)) )
+    diff = fabs( zi_swap.rate - (fixed_rate*(zi_swap.index_fixing/baseCPI)) )
     self.assertAlmostEqual(diff, 0.0, tol)
 
 

@@ -52,13 +52,14 @@ cdef class ZeroCouponInflationSwapHelper:
             deref(calendar._thisptr),
             <_cal.BusinessDayConvention> paymentConvention,
             deref(DayCounter._thisptr),
-            static_pointer_cast[_ii.ZeroInflationIndex](deref(zii._thisptr))
+            static_pointer_cast[_ii.ZeroInflationIndex](zii._thisptr)
             ))
 
     def set_term_structure(self, ZeroInflationTermStructure zits):
-        self._thisptr.get().setTermStructure(
-            <_its.ZeroInflationTermStructure*>(zits._thisptr.get()))
-
+        cdef _its.InflationTermStructure* _iTS = zits._get_term_structure()
+        self._thisptr.get().setTermStructure(\
+            <_its.ZeroInflationTermStructure*>_iTS)
+        
 cdef class YearOnYearInflationSwapHelper:
 
     def __init__(self, Quote quote,
@@ -80,10 +81,11 @@ cdef class YearOnYearInflationSwapHelper:
             deref(calendar._thisptr),
             <_cal.BusinessDayConvention> paymentConvention,
             deref(DayCounter._thisptr),
-            static_pointer_cast[_ii.YoYInflationIndex](deref(zii._thisptr))
+            static_pointer_cast[_ii.YoYInflationIndex](zii._thisptr)
             ))
 
     def set_term_structure(self, ZeroInflationTermStructure zits):
+        cdef _its.InflationTermStructure* _iTS = zits._get_term_structure()
         self._thisptr.get().setTermStructure(
-            <_its.YoYInflationTermStructure*>(zits._thisptr.get()))
+            <_its.YoYInflationTermStructure*>_iTS)
 

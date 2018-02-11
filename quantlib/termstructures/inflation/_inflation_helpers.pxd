@@ -11,13 +11,14 @@ include '../../types.pxi'
 from libcpp cimport bool
 
 from quantlib.handle cimport Handle, shared_ptr
+
+cimport quantlib.indexes._inflation_index as _ii
+cimport quantlib.termstructures.inflation._inflation_helpers as _ih
 from quantlib._quote cimport Quote
 from quantlib.time._calendar cimport BusinessDayConvention, Calendar
 from quantlib.time._date cimport Date
 from quantlib.time._daycounter cimport DayCounter
 from quantlib.time._period cimport Period
-
-cimport quantlib.indexes._inflation_index as _ii
 
 from quantlib.termstructures._default_term_structure cimport \
                                             DefaultProbabilityTermStructure
