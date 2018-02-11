@@ -47,28 +47,6 @@ cdef class InflationTermStructure:
         
 cdef class ZeroInflationTermStructure(InflationTermStructure):
 
-    def __init__(self,
-                DayCounter day_counter,
-                Rate base_zero_rate,
-                Period lag,
-                Frequency frequency,
-                bool index_is_interpolated,
-                YieldTermStructure ts,
-                Seasonality seasonality):
-
-        cdef Handle[_yts.YieldTermStructure] ts_handle = \
-            deref(<Handle[_yts.YieldTermStructure]*> ts._thisptr)
-
-        self._thisptr = shared_ptr[_its.InflationTermStructure](
-                new _its.ZeroInflationTermStructure(
-                    deref(day_counter._thisptr),
-                    base_zero_rate,
-                     deref(lag._thisptr.get()),
-                     <_ir.Frequency>frequency,
-                     index_is_interpolated,
-                     ts_handle,
-                     deref(seasonality._thisptr.get())))
-
     
     def zeroRate(self, Date d,
                  Period inst_obs_lag,
@@ -90,30 +68,9 @@ cdef class ZeroInflationTermStructure(InflationTermStructure):
           <_its.ZeroInflationTermStructure*>self._thisptr.get()
         return term_structure.zeroRate(t, extrapolate)
   
-        
+
 cdef class YoYInflationTermStructure(InflationTermStructure):
 
-    def __init__(self,
-                DayCounter day_counter,
-                Rate base_zero_rate,
-                Period lag,
-                Frequency frequency,
-                bool index_is_interpolated,
-                YieldTermStructure ts,
-                Seasonality seasonality):
-
-        cdef Handle[_yts.YieldTermStructure] ts_handle = \
-            deref(<Handle[_yts.YieldTermStructure]*> ts._thisptr)
-
-        self._thisptr = shared_ptr[_its.InflationTermStructure](
-                new _its.YoYInflationTermStructure(
-                    deref(day_counter._thisptr),
-                    base_zero_rate,
-                     deref(lag._thisptr.get()),
-                     <_ir.Frequency>frequency,
-                     index_is_interpolated,
-                     ts_handle,
-                     deref(seasonality._thisptr.get())))
 
     def yoyRate(self, Date d,
                 Period inst_obs_lag,
