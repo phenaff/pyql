@@ -21,9 +21,14 @@ from quantlib.time.calendar cimport Calendar
 from quantlib.termstructures.inflation_term_structure cimport \
     ZeroInflationTermStructure
 from quantlib.termstructures.inflation.inflation_helpers cimport \
-    ZeroCouponInflationSwapHelper, ZeroCouponInflationHelper
+    ZeroCouponInflationSwapHelper 
+
+
 
 cdef class PiecewiseZeroInflationCurve(InflationTermStructure):
+
+    def __init__(self):
+      pass
 
     def __init__(self, Interpolator interpolator,
                Date evaluation_date,
@@ -37,13 +42,12 @@ cdef class PiecewiseZeroInflationCurve(InflationTermStructure):
                list helpers,
                Real accuracy = 1.0e-12):
 
-
         # convert Python list to std::vector
-        cdef vector[shared_ptr[_ih.ZeroCouponInflationHelper]] instruments
+        cdef vector[shared_ptr[_pic.ZeroInflationHelper]] instruments
 
         for helper in helpers:
             instruments.push_back(
-                <shared_ptr[_ih.ZeroCouponInflationHelper]>\
+                <shared_ptr[_pic.ZeroInflationHelper]>\
                 deref((<ZeroCouponInflationSwapHelper?>helper)._thisptr)
             )
 
@@ -51,11 +55,11 @@ cdef class PiecewiseZeroInflationCurve(InflationTermStructure):
         self._interpolator = interpolator
 
         cdef Handle[_yts.YieldTermStructure] ts_handle = \
-            deref(<Handle[_yts.YieldTermStructure]*> ts._get_term_structure())
+            deref(<Handle[_yts.YieldTermStructure]*> ts._thisptr)
 
-
+        
         if interpolator == Linear:
-            self._thisptr.linkTo(shared_ptr[_its.InflationTermStructure](
+            self._thisptr = shared_ptr[_its.InflationTermStructure](
                 new _pic.PiecewiseZeroInflationCurve[_pic.Linear](
                     deref(evaluation_date._thisptr),
                     deref(calendar._thisptr),
@@ -65,10 +69,11 @@ cdef class PiecewiseZeroInflationCurve(InflationTermStructure):
                      index_is_interpolated,
                      base_zero_rate,
                      ts_handle,
-                     instruments)))
+                     instruments,
+                     accuracy))
 
         elif interpolator == LogLinear:
-            self._thisptr.linkTo(shared_ptr[_its.InflationTermStructure](
+            self._thisptr = shared_ptr[_its.InflationTermStructure](
                 new _pic.PiecewiseZeroInflationCurve[_pic.LogLinear](
                     deref(evaluation_date._thisptr),
                     deref(calendar._thisptr),
@@ -78,4 +83,5 @@ cdef class PiecewiseZeroInflationCurve(InflationTermStructure):
                      index_is_interpolated,
                      base_zero_rate,
                      ts_handle,
-                     instruments)))
+                     instruments,
+                     accuracy))

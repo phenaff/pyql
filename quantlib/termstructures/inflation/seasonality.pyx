@@ -47,7 +47,7 @@ cdef class Seasonality:
 		    Rate r,
 		    InflationTermStructure iTS):
 
-        cdef _if.InflationTermStructure* _iTS = iTS._get_term_structure()
+        cdef _if.InflationTermStructure* _iTS = iTS._thisptr.get()
         return self._thisptr.get().correctZeroRate(
             deref(d._thisptr.get()),
             r,
@@ -58,7 +58,7 @@ cdef class Seasonality:
 		    Rate r,
 		    InflationTermStructure iTS):
 
-        cdef _if.InflationTermStructure* _iTS = iTS._get_term_structure()
+        cdef _if.InflationTermStructure* _iTS = iTS._thisptr.get()
         return self._thisptr.get().correctYoYRate(
             deref(d._thisptr.get()),
             r,
@@ -67,7 +67,7 @@ cdef class Seasonality:
     def isConsistent(self,
 		    InflationTermStructure iTS):
 
-        cdef _if.InflationTermStructure* _iTS = iTS._get_term_structure()
+        cdef _if.InflationTermStructure* _iTS = iTS._thisptr.get()
         return self._thisptr.get().isConsistent(
             deref(_iTS))
                   
@@ -109,7 +109,7 @@ cdef class MultiplicativePriceSeasonality(Seasonality):
     
     def isConsistent(self, InflationTermStructure iTS):
 
-        cdef _if.InflationTermStructure* _iTS = iTS._get_term_structure()
+        cdef _if.InflationTermStructure* _iTS = iTS._thisptr.get()
 
         return self._thisptr.get().isConsistent(
             deref(_iTS))

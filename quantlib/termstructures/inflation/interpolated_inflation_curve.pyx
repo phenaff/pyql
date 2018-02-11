@@ -82,17 +82,18 @@ cdef class InterpolatedZeroInflationCurve(ZeroInflationTermStructure):
         qldate = date_from_qldate(_date)
         return qldate
 
-    @property
-    def maxDate(self):
-        if self._trait == Linear:
-            _date = (<_iic.InterpolatedZeroInflationCurve[intpl.Linear]*>
-                      self._thisptr.get()).maxDate()
-        else:
-            _date = (<_iic.InterpolatedZeroInflationCurve[intpl.LogLinear]*>
-                       self._thisptr.get()).maxDate()
+    # TODO: unresolved issue: ambigous overloaded method
+    # @property
+    # def maxDate(self):
+    #     if self._trait == Linear:
+    #         _date = (<_iic.InterpolatedZeroInflationCurve[intpl.Linear]*>
+    #                   self._thisptr.get()).maxDate()
+    #     else:
+    #         _date = (<_iic.InterpolatedZeroInflationCurve[intpl.LogLinear]*>
+    #                    self._thisptr.get()).maxDate()
 
-        qldate = date_from_qldate(_date)
-        return qldate
+    #     qldate = date_from_qldate(_date)
+    #     return qldate
 
     @property
     def nodes(self):

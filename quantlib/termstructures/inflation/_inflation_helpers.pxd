@@ -31,12 +31,12 @@ from quantlib.termstructures._inflation_term_structure cimport (
 
 cdef extern from 'ql/termstructures/inflation/inflationhelpers.hpp' namespace 'QuantLib':
 
-    ctypedef BootstrapHelper[ZeroInflationTermStructure] \
-                                        ZeroCouponInflationHelper
-    ctypedef BootstrapHelper[YoYInflationTermStructure] \
-                                        YoYInflationHelper
+    #ctypedef BootstrapHelper[ZeroInflationTermStructure] \
+    #                                    ZeroCouponInflationHelper
+    #ctypedef BootstrapHelper[YoYInflationTermStructure] \
+    #                                    YoYInflationHelper
                                         
-    cdef cppclass ZeroCouponInflationSwapHelper(ZeroCouponInflationHelper):
+    cdef cppclass ZeroCouponInflationSwapHelper:
         ZeroCouponInflationSwapHelper(
             Handle[Quote]& quote,
             Period& swapObsLag,
@@ -49,7 +49,7 @@ cdef extern from 'ql/termstructures/inflation/inflationhelpers.hpp' namespace 'Q
         void setTermStructure(ZeroInflationTermStructure*) except +
         Real impliedQuote() 
 
-    cdef cppclass YearOnYearInflationSwapHelper(YoYInflationHelper):
+    cdef cppclass YearOnYearInflationSwapHelper:
         YearOnYearInflationSwapHelper(
             Handle[Quote]& quote,
             Period& swapObsLag,

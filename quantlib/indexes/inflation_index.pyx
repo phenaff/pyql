@@ -12,7 +12,7 @@ from quantlib.currency.currencies import GBPCurrency
 include '../types.pxi'
 
 from cython.operator cimport dereference as deref
-from quantlib.handle cimport Handle, shared_ptr
+from quantlib.handle cimport Handle, shared_ptr, static_pointer_cast
 
 from libcpp cimport bool
 from libcpp.string cimport string
@@ -88,8 +88,14 @@ cdef class ZeroInflationIndex(InflationIndex):
                  Currency currency,
                  ZeroInflationTermStructure ts=None):
         
-        cdef Handle[_its.ZeroInflationTermStructure] ts_handle = \
-           deref(<Handle[_its.ZeroInflationTermStructure]*>ts._get_term_structure())
+        
+        cdef Handle[_its.ZeroInflationTermStructure] ts_handle
+        if ts is None:
+            ts_handle = Handle[_its.ZeroInflationTermStructure]()
+        else:   
+            ts_handle = Handle[_its.ZeroInflationTermStructure](
+            static_pointer_cast[_its.ZeroInflationTermStructure](ts._thisptr))
+        
 
         # convert the Python str to C++ string
         cdef string c_family_name = family_name.encode('utf-8')
@@ -120,8 +126,9 @@ cdef class YoYInflationIndex(InflationIndex):
         if ts is None:
             ts_handle = Handle[_its.YoYInflationTermStructure]()
         else:
-            ts_handle = deref(<Handle[_its.YoYInflationTermStructure]*>ts._get_term_structure())
-
+            ts_handle = Handle[_its.YoYInflationTermStructure](
+            static_pointer_cast[_its.YoYInflationTermStructure](ts._thisptr))
+        
         # convert the Python str to C++ string
         cdef string c_family_name = family_name.encode('utf-8')
 

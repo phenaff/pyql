@@ -9,17 +9,9 @@ from quantlib.time.date cimport Date
 from quantlib.time.daycounter cimport DayCounter
 from quantlib.time._period cimport Frequency 
 
-# cdef class InflationTermStructure:
-#     cdef RelinkableHandle[_its.InflationTermStructure] _thisptr
-#     cdef inline _its.InflationTermStructure* _get_term_structure(self) except NULL
-#     """
-#     cdef _is_empty(self)
-#     cdef _raise_if_empty(self)
-#     """
-
 cdef class InflationTermStructure:
     cdef shared_ptr[_its.InflationTermStructure] _thisptr
-    
+
 cdef class ZeroInflationTermStructure(InflationTermStructure):
     pass
 

@@ -32,68 +32,10 @@ cimport quantlib.termstructures.inflation._seasonality as _se
 from quantlib.termstructures.inflation.seasonality cimport Seasonality
 
 cdef class InflationTermStructure:
-    """Abstract Base Class.
-    def __cinit__(self):
-        self.relinkable = False
-        self._thisptr = NULL
-
-    def __init__(self, relinkable=True):
-        if relinkable:
-            self.relinkable = True
-            # Create a new RelinkableHandle to a InflationTermStructure within a
-            # new shared_ptr
-            self._thisptr = <shared_ptr[Handle[_if.InflationTermStructure]]*> new \
-                shared_ptr[RelinkableHandle[_if.InflationTermStructure]](
-                    new RelinkableHandle[_if.InflationTermStructure]()
-                )
-        else:
-            self._thisptr = new shared_ptr[Handle[_if.InflationTermStructure]](
-                new Handle[_if.InflationTermStructure]()
-            )
-    """
-            
-    def link_to(self, InflationTermStructure structure):
-        if structure._thisptr.empty():
-            raise ValueError('Inflation term structure not initialized')
-        self._thisptr.linkTo(structure._thisptr.currentLink())
-
-        """
-        cdef RelinkableHandle[_if.InflationTermStructure]* rh
-        if not self.relinkable:
-            raise ValueError('Non relinkable inflation term structure !')
-        else:
-            rh = <RelinkableHandle[_if.InflationTermStructure]*>self._thisptr.get()
-            rh.linkTo(
-                structure._thisptr.get().currentLink()
-            )
-
-        return
-        """
-
-    cdef inline _if.InflationTermStructure* _get_term_structure(self) except NULL:
-
-        if self._thisptr.empty():
-            raise ValueError('Inflation term structure not initialized')
-        return self._thisptr.currentLink().get()
-
-    """
-    cdef _is_empty(self):
-
-        cdef _if.InflationTermStructure* term_structure = self._get_term_structure()
-        cdef _yts.Date ref_date = term_structure.referenceDate()
-        return term_structure.empty()
-
-    cdef _raise_if_empty(self):
-        # verify that the handle is not empty. We could add an except + on the
-        # definition of the currentLink() method but it creates more trouble on
-        # the code generation with Cython than what it solves
-        if self._is_empty():
-            raise ValueError('Empty handle to the inflation term structure')        
-    """
 
     @property 
     def max_date(self):
-        cdef _if.InflationTermStructure* term_structure = self._get_term_structure()
+        cdef _if.InflationTermStructure* term_structure = self._thisptr.get()
         cdef _date.Date max_date = term_structure.maxDate()
         return date_from_qldate(max_date)
 
@@ -109,7 +51,7 @@ cdef class ZeroInflationTermStructure(InflationTermStructure):
                  bool extrapolate):
         
         cdef _if.ZeroInflationTermStructure* term_structure = \
-          <_if.ZeroInflationTermStructure*>self._get_term_structure()
+          <_if.ZeroInflationTermStructure*>self._thisptr.get()
         return term_structure.zeroRate(
             deref(d._thisptr.get()),
             deref(inst_obs_lag._thisptr.get()),
@@ -120,7 +62,7 @@ cdef class ZeroInflationTermStructure(InflationTermStructure):
                  bool extrapolate):
 
         cdef _if.ZeroInflationTermStructure* term_structure = \
-          <_if.ZeroInflationTermStructure*>self._get_term_structure()
+          <_if.ZeroInflationTermStructure*>self._thisptr.get()
         return term_structure.zeroRate(t, extrapolate)
         
 cdef class YoYInflationTermStructure(InflationTermStructure):
@@ -134,7 +76,7 @@ cdef class YoYInflationTermStructure(InflationTermStructure):
                 bool extrapolate):
 
         cdef _if.YoYInflationTermStructure* term_structure = \
-          <_if.YoYInflationTermStructure*>self._get_term_structure()
+          <_if.YoYInflationTermStructure*>self._thisptr.get()
 
         return term_structure.yoyRate(
             deref(d._thisptr.get()),
@@ -146,7 +88,7 @@ cdef class YoYInflationTermStructure(InflationTermStructure):
                 bool extrapolate):
 
         cdef _if.YoYInflationTermStructure* term_structure = \
-          <_if.YoYInflationTermStructure*>self._get_term_structure()
+          <_if.YoYInflationTermStructure*>self._thisptr.get()
         return term_structure.yoyRate(t, extrapolate)
 
 

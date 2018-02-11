@@ -56,7 +56,7 @@ cdef class ZeroCouponInflationSwapHelper:
             ))
 
     def set_term_structure(self, ZeroInflationTermStructure zits):
-        cdef _its.InflationTermStructure* _iTS = zits._get_term_structure()
+        cdef _its.InflationTermStructure* _iTS = zits._thisptr.get()
         self._thisptr.get().setTermStructure(\
             <_its.ZeroInflationTermStructure*>_iTS)
         
@@ -85,7 +85,7 @@ cdef class YearOnYearInflationSwapHelper:
             ))
 
     def set_term_structure(self, ZeroInflationTermStructure zits):
-        cdef _its.InflationTermStructure* _iTS = zits._get_term_structure()
+        cdef _its.InflationTermStructure* _iTS = zits._thisptr.get()
         self._thisptr.get().setTermStructure(
             <_its.YoYInflationTermStructure*>_iTS)
 

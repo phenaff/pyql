@@ -29,7 +29,9 @@ cdef extern from 'ql/termstructures/inflation/interpolatedzeroinflationcurve.hpp
                                        ) except +
 
         const Date baseDate()
-        const Date maxDate()
+        # FIXME:
+        # ambigous overloaded method
+        # const Date maxDate()
 
         const vector[Date]& dates()
         const vector[Time]& times()

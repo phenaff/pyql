@@ -12,7 +12,9 @@ from quantlib.time._daycounter cimport DayCounter
 from quantlib.time._calendar cimport Calendar
 from quantlib.time._period cimport Period, Frequency
 from quantlib.termstructures._yield_term_structure cimport YieldTermStructure
+from quantlib.termstructures._helpers cimport BootstrapHelper
 
+ctypedef  BootstrapHelper[ZeroInflationTermStructure] ZeroInflationHelper 
 
 cdef extern from 'ql/termstructures/inflation/inflationtraits.hpp' namespace 'QuantLib':
 
@@ -36,6 +38,7 @@ cdef extern from 'ql/termstructures/inflation/interpolatedzeroinflationcurve.hpp
 cdef extern from 'ql/termstructures/inflation/piecewisezeroinflationcurve.hpp' namespace 'QuantLib':
 
     cdef cppclass PiecewiseZeroInflationCurve[I](InterpolatedZeroInflationCurve[I]):
+        PiecewiseZeroInflationCurve()
         PiecewiseZeroInflationCurve(Date& referenceDate,
                Calendar& calendar,
                DayCounter& dayCounter,
@@ -44,6 +47,6 @@ cdef extern from 'ql/termstructures/inflation/piecewisezeroinflationcurve.hpp' n
                bool indexIsInterpolated,
                Rate baseZeroRate,
                Handle[YieldTermStructure]& nominalTS,
-               vector[shared_ptr[_ih.ZeroCouponInflationHelper]]& instruments,
+               vector[shared_ptr[ZeroInflationHelper]]& instruments,
                Real accuracy = 1.0e-12) except +
 
