@@ -1,19 +1,25 @@
 cimport quantlib.termstructures._inflation_term_structure as _its
-from libcpp cimport bool as cbool
+from quantlib.handle cimport shared_ptr
+"""
+from quantlib.handle cimport RelinkableHandle
+"""
 from libcpp cimport bool
-from quantlib.handle cimport shared_ptr, Handle
 
 from quantlib.time.date cimport Date
 from quantlib.time.daycounter cimport DayCounter
 from quantlib.time._period cimport Frequency 
 
-cdef class InflationTermStructure:
-    cdef shared_ptr[Handle[_its.InflationTermStructure]]* _thisptr
-    cdef cbool relinkable
-    cdef _its.InflationTermStructure* _get_term_structure(self)
-    cdef _is_empty(self)
-    cdef _raise_if_empty(self)
+# cdef class InflationTermStructure:
+#     cdef RelinkableHandle[_its.InflationTermStructure] _thisptr
+#     cdef inline _its.InflationTermStructure* _get_term_structure(self) except NULL
+#     """
+#     cdef _is_empty(self)
+#     cdef _raise_if_empty(self)
+#     """
 
+cdef class InflationTermStructure:
+    cdef shared_ptr[_its.InflationTermStructure] _thisptr
+    
 cdef class ZeroInflationTermStructure(InflationTermStructure):
     pass
 

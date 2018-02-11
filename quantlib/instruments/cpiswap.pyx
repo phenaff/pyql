@@ -20,7 +20,7 @@ cimport quantlib.time._businessdayconvention as _bc
 from cython.operator cimport dereference as deref
 from libcpp cimport bool
 
-from quantlib.handle cimport shared_ptr
+from quantlib.handle cimport shared_ptr, static_pointer_cast
 from quantlib.time.schedule cimport Schedule
 from quantlib.time.daycounter cimport DayCounter
 from quantlib.time._businessdayconvention cimport ModifiedFollowing, BusinessDayConvention
@@ -28,6 +28,7 @@ from quantlib.time._calendar cimport BusinessDayConvention
 from quantlib.time.date cimport Period
 from quantlib.indexes.ibor_index cimport IborIndex
 from quantlib.indexes.inflation_index cimport ZeroInflationIndex
+from quantlib.cashflow cimport Leg
 
 cpdef public enum CPISwapType:
     Payer    = _cpiswap.Payer
@@ -80,24 +81,34 @@ cdef class CPISwap(Swap):
                 deref(float_schedule._thisptr),
                 float_roll,
                 fixing_days,
-                deref(<shared_ptr[_ib.IborIndex]*> float_index._thisptr),
+                static_pointer_cast[_ib.IborIndex](float_index._thisptr),
                 fixed_rate,
                 base_CPI,
                 deref(fixed_daycount._thisptr),
                 deref(fixed_schedule._thisptr),
                 fixed_roll,
                 deref(observation_lag._thisptr),
-                deref(<shared_ptr[_ii.ZeroInflationIndex]*> fixed_index._thisptr),
+                static_pointer_cast[_ii.ZeroInflationIndex](\
+                    fixed_index._thisptr),
                 observation_interpolation,
                 inflation_nominal
             )
         )
     
                 
-    property float_leg_npv:
-        def __get__(self):
-            cdef Real res = get_cpiswap(self).floatLegNPV()
+    @property 
+    def float_leg_npv(self):
+       cdef Real res = get_cpiswap(self).floatLegNPV()
+       return res
     
-    property fair_spread:
-        def __get__(self):
-            cdef Real res = get_cpiswap(self).fairSpread()
+    @property 
+    def fair_spread(self):
+        cdef Real res = get_cpiswap(self).fairSpread()
+        return res
+
+    @property 
+    def cpi_leg(self):
+        cdef Leg leg = Leg.__new__(Leg)
+        leg._thisptr = get_cpiswap(self).cpiLeg()
+        return leg
+

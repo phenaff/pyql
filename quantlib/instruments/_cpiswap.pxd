@@ -22,6 +22,7 @@ from quantlib.instruments._swap cimport Swap
 
 from quantlib.indexes._ibor_index cimport IborIndex
 from quantlib.indexes._inflation_index cimport ZeroInflationIndex
+from quantlib._cashflow cimport Leg
 
 cdef extern from 'ql/instruments/cpiswap.hpp' namespace 'QuantLib::CPISwap':
 
@@ -68,4 +69,6 @@ cdef extern from 'ql/instruments/cpiswap.hpp' namespace 'QuantLib':
 
         Real floatLegNPV()
         Spread fairSpread()
+        Leg& cpiLeg() except +
+
 

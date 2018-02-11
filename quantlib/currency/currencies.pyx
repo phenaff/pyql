@@ -2,6 +2,7 @@
 Contains all the country specific currency implementations.
 """
 
+
 cimport _currency as _cu
 
 from currency cimport Currency

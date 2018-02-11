@@ -14,7 +14,6 @@ from libcpp.string cimport string
 
 from quantlib.index cimport Index
 from quantlib.handle cimport shared_ptr
-from quantlib.time.date cimport Period
 from quantlib.time.daycounter cimport DayCounter
 from quantlib.currency.currency cimport Currency
 from quantlib.time.calendar cimport Calendar

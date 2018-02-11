@@ -1,38 +1,44 @@
 include '../../types.pxi'
 
 from cython.operator cimport dereference as deref
-from quantlib.handle cimport shared_ptr
+from quantlib.handle cimport shared_ptr, Handle
 
 from libcpp cimport bool
 from libcpp.vector cimport vector
 from libcpp.string cimport string
 
 cimport _piecewise_inflation_curve as _pic
+cimport quantlib.termstructures.inflation._inflation_helpers as _ih
+cimport quantlib.termstructures._inflation_term_structure as _its
+cimport quantlib._interest_rate as _ir
+cimport quantlib.termstructures._yield_term_structure as _yts
 
-from quantlib.time.date cimport Date, date_from_qldate
+from quantlib.time.date cimport Date, Period, date_from_qldate
 cimport quantlib.time._date as _date
 from quantlib.time.daycounter cimport DayCounter
+from quantlib.time._period cimport Frequency
 from quantlib.time.calendar cimport Calendar
-cimport quantlib.termstructures.credit._credit_helpers as _ch
-from default_probability_helpers cimport CdsHelper
-cimport quantlib.termstructures._default_term_structure as _dts
-from quantlib.termstructures.default_term_structure cimport DefaultProbabilityTermStructure
+from quantlib.termstructures.inflation_term_structure cimport \
+    ZeroInflationTermStructure
+from quantlib.termstructures.inflation.inflation_helpers cimport \
+    ZeroCouponInflationSwapHelper, ZeroCouponInflationHelper
 
 cdef class PiecewiseZeroInflationCurve(InflationTermStructure):
 
-	def __init__(self, Interpolator interpolator,
+    def __init__(self, Interpolator interpolator,
+               Date evaluation_date,
                Calendar calendar,
                DayCounter day_counter,
                Period lag,
                Frequency frequency,
-               bool indexIsInterpolated,
-               Rate baseZeroRate,
-               ZeroInflationTermStructure ts=None,
+               bool index_is_interpolated,
+               Rate base_zero_rate,
+               ZeroInflationTermStructure ts,
                list helpers,
                Real accuracy = 1.0e-12):
 
 
-		# convert Python list to std::vector
+        # convert Python list to std::vector
         cdef vector[shared_ptr[_ih.ZeroCouponInflationHelper]] instruments
 
         for helper in helpers:
@@ -44,16 +50,14 @@ cdef class PiecewiseZeroInflationCurve(InflationTermStructure):
         self._trait = None
         self._interpolator = interpolator
 
-        cdef Handle[_its.ZeroInflationTermStructure] ts_handle
-        if ts is None:
-            ts_handle = Handle[_its.ZeroInflationTermStructure]()
-        else:
-            ts_handle = deref(<Handle[_its.ZeroInflationTermStructure]*>ts._thisptr.get())
+        cdef Handle[_yts.YieldTermStructure] ts_handle = \
+            deref(<Handle[_yts.YieldTermStructure]*> ts._get_term_structure())
 
 
-		if interpolator == Linear:
-            self._thisptr = shared_ptr[_dts.DefaultProbabilityTermStructure](
+        if interpolator == Linear:
+            self._thisptr.linkTo(shared_ptr[_its.InflationTermStructure](
                 new _pic.PiecewiseZeroInflationCurve[_pic.Linear](
+                    deref(evaluation_date._thisptr),
                     deref(calendar._thisptr),
                     deref(day_counter._thisptr),
                      deref(lag._thisptr.get()),
@@ -61,11 +65,12 @@ cdef class PiecewiseZeroInflationCurve(InflationTermStructure):
                      index_is_interpolated,
                      base_zero_rate,
                      ts_handle,
-                     instruments)
+                     instruments)))
 
         elif interpolator == LogLinear:
-            self._thisptr = shared_ptr[_dts.DefaultProbabilityTermStructure](
+            self._thisptr.linkTo(shared_ptr[_its.InflationTermStructure](
                 new _pic.PiecewiseZeroInflationCurve[_pic.LogLinear](
+                    deref(evaluation_date._thisptr),
                     deref(calendar._thisptr),
                     deref(day_counter._thisptr),
                      deref(lag._thisptr.get()),
@@ -73,4 +78,4 @@ cdef class PiecewiseZeroInflationCurve(InflationTermStructure):
                      index_is_interpolated,
                      base_zero_rate,
                      ts_handle,
-                     instruments)
+                     instruments)))
