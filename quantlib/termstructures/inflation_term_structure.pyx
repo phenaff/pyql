@@ -32,6 +32,9 @@ cdef class InflationTermStructure:
     def __cinit__(self):
         pass
 
+    def __init__(self):
+        pass
+
     @property
     def reference_date(self):
         cdef _its.InflationTermStructure* term_structure = self._thisptr.get()
