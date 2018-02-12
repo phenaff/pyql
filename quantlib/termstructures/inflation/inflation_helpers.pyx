@@ -20,7 +20,6 @@ cimport quantlib.time._calendar as _cal
 cimport _inflation_helpers as _ih
 cimport quantlib.termstructures._inflation_term_structure as _its
 
-
 from quantlib.time.daycounter cimport DayCounter
 from quantlib.time.date cimport Period, Date
 from quantlib.time.calendar cimport Calendar
@@ -60,32 +59,32 @@ cdef class ZeroCouponInflationSwapHelper:
         self._thisptr.get().setTermStructure(\
             <_its.ZeroInflationTermStructure*>_iTS)
         
-cdef class YearOnYearInflationSwapHelper:
+# cdef class YearOnYearInflationSwapHelper:
 
-    def __init__(self, Quote quote,
-            Period swapObsLag,
-            Date maturity,
-            Calendar calendar,
-            int paymentConvention,
-            DayCounter DayCounter,
-            YoYInflationIndex zii):
+#     def __init__(self, Quote quote,
+#             Period swapObsLag,
+#             Date maturity,
+#             Calendar calendar,
+#             int paymentConvention,
+#             DayCounter DayCounter,
+#             YoYInflationIndex zii):
 
-        cdef Handle[_qt.Quote] quote_handle = \
-            Handle[_qt.Quote](deref(quote._thisptr))
+#         cdef Handle[_qt.Quote] quote_handle = \
+#             Handle[_qt.Quote](deref(quote._thisptr))
 
         
-        self._thisptr = new shared_ptr[_ih.YearOnYearInflationSwapHelper](
-            new _ih.YearOnYearInflationSwapHelper(quote_handle,
-            deref(swapObsLag._thisptr),
-            deref(maturity._thisptr.get()),
-            deref(calendar._thisptr),
-            <_cal.BusinessDayConvention> paymentConvention,
-            deref(DayCounter._thisptr),
-            static_pointer_cast[_ii.YoYInflationIndex](zii._thisptr)
-            ))
+#         self._thisptr = new shared_ptr[_ih.YearOnYearInflationSwapHelper](
+#             new _ih.YearOnYearInflationSwapHelper(quote_handle,
+#             deref(swapObsLag._thisptr),
+#             deref(maturity._thisptr.get()),
+#             deref(calendar._thisptr),
+#             <_cal.BusinessDayConvention> paymentConvention,
+#             deref(DayCounter._thisptr),
+#             static_pointer_cast[_ii.YoYInflationIndex](zii._thisptr)
+#             ))
 
-    def set_term_structure(self, ZeroInflationTermStructure zits):
-        cdef _its.InflationTermStructure* _iTS = zits._thisptr.get()
-        self._thisptr.get().setTermStructure(
-            <_its.YoYInflationTermStructure*>_iTS)
+#     def set_term_structure(self, ZeroInflationTermStructure zits):
+#         cdef _its.InflationTermStructure* _iTS = zits._thisptr.get()
+#         self._thisptr.get().setTermStructure(
+#             <_its.YoYInflationTermStructure*>_iTS)
 

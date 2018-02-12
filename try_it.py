@@ -1,5 +1,5 @@
+# from quantlib.instruments.cpiswap import CPISwap, Payer, Receiver
 from quantlib.currency.api import USDCurrency
-#from quantlib.instruments.cpiswap import CPISwap, Payer, Receiver
 from quantlib.indexes.libor import Libor
 from quantlib.market.market import libor_market
 from quantlib.pricingengines.swap import DiscountingSwapEngine

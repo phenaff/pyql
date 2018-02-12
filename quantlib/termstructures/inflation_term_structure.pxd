@@ -1,8 +1,5 @@
-cimport quantlib.termstructures._inflation_term_structure as _its
+cimport _inflation_term_structure as _its
 from quantlib.handle cimport shared_ptr
-"""
-from quantlib.handle cimport RelinkableHandle
-"""
 from libcpp cimport bool
 
 from quantlib.time.date cimport Date

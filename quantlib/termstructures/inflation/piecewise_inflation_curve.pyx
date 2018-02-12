@@ -49,11 +49,11 @@ cdef class PiecewiseZeroInflationCurve(InflationTermStructure):
                Real accuracy = 1.0e-12):
 
         # convert Python list to std::vector
-        cdef vector[shared_ptr[_ih.ZeroCouponInflationSwapHelper]] instruments
+        cdef vector[shared_ptr[BootstrapHelper[ZeroInflationTermStructure]]] instruments
 
         for helper in helpers:
             instruments.push_back(
-                <shared_ptr[_ih.ZeroCouponInflationSwapHelper]>\
+                <shared_ptr[BootstrapHelper[ZeroInflationTermStructure]]>\
                 deref((<ZeroCouponInflationSwapHelper?>helper)._thisptr)
             )
 

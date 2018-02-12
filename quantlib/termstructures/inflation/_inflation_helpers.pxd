@@ -26,6 +26,8 @@ from quantlib.termstructures._inflation_term_structure cimport (
     YoYInflationTermStructure, ZeroInflationTermStructure)
 
 
+#ctypedef BootstrapHelper[ZeroInflationTermStructure] ZeroInflationHelper 
+
 cdef extern from 'ql/termstructures/inflation/inflationhelpers.hpp' namespace 'QuantLib':
                                         
     cdef cppclass ZeroCouponInflationSwapHelper(BootstrapHelper[ZeroInflationTermStructure]):
