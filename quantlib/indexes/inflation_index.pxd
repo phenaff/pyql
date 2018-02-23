@@ -9,10 +9,10 @@ cdef class ZeroInflationIndex(InflationIndex):
 cdef class YoYInflationIndex(InflationIndex):
     pass
 
-cdef class AUCPI(ZeroInflationIndex):
+cdef class UKRPI(ZeroInflationIndex):
     pass
 
-cdef class UKRPI(ZeroInflationIndex):
+cdef class AUCPI(ZeroInflationIndex):
     pass
 
 cdef class YYUKRPI(YoYInflationIndex):

@@ -6,38 +6,37 @@
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 """
-from quantlib.indexes.inflation_index import ZeroInflationIndex
-from quantlib.currency.currencies import GBPCurrency
 
 include '../types.pxi'
 
-from cython.operator cimport dereference as deref
-from quantlib.handle cimport Handle, shared_ptr, static_pointer_cast
-
 from libcpp cimport bool
 from libcpp.string cimport string
+from cython.operator cimport dereference as deref
+from quantlib.handle cimport Handle, shared_ptr, static_pointer_cast
 
 cimport quantlib._index as _in
 cimport quantlib.indexes._inflation_index as _ii
 cimport quantlib.termstructures._inflation_term_structure as _its
 cimport quantlib._interest_rate as _ir
 cimport quantlib.time._period as _pe
-from quantlib.time._period cimport Frequency, Months
+cimport quantlib.currency._currency as _cu
 
+from quantlib.time._period cimport Frequency, Months
 from quantlib.time.frequency cimport Monthly
-from quantlib.index cimport Index
 from quantlib.time.date cimport Period, period_from_qlperiod
+
+from quantlib.index cimport Index
+from quantlib.indexes.inflation_index import ZeroInflationIndex
+
 from quantlib.indexes.region cimport Region
+from quantlib.indexes.regions import AustraliaRegion, UKRegion
+
 from quantlib.currency.currency cimport Currency
+from quantlib.currency.api import AUDCurrency, GBPCurrency
+
 from quantlib.termstructures.inflation_term_structure cimport \
     ZeroInflationTermStructure, YoYInflationTermStructure
 
-
-from quantlib.currency.api import AUDCurrency, GBPCurrency
-from quantlib.indexes.regions import AustraliaRegion, UKRegion
-
-cimport quantlib.currency._currency as _cu
-from quantlib.currency.currency cimport Currency
 
 cdef class InflationIndex(Index):
 

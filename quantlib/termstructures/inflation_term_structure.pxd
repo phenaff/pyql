@@ -15,10 +15,12 @@ cdef class ZeroInflationTermStructure(InflationTermStructure):
 cdef class YoYInflationTermStructure(InflationTermStructure):
     pass
 
-cpdef list inflation_period(Date date, Frequency f)
+#cpdef list 
+# def inflation_period(Date date, Frequency f)
 
-cpdef double inflation_year_fraction(Frequency f, 
-                             bool index_is_interpolated,
-                             DayCounter day_counter,
-                             Date d1,
-                             Date d2)
+# #cpdef double 
+# def inflation_year_fraction(Frequency f, 
+#                              bool index_is_interpolated,
+#                              DayCounter day_counter,
+#                              Date d1,
+#                              Date d2)

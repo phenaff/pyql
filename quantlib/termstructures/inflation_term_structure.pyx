@@ -97,7 +97,8 @@ cdef class YoYInflationTermStructure(InflationTermStructure):
         return term_structure.yoyRate(t, extrapolate)
 
 
-cpdef list inflation_period(Date d, Frequency frequency):
+# cpdef list
+def inflation_period(Date d, Frequency frequency):
 
     cdef pair[_date.Date, _date.Date] res
     
@@ -106,7 +107,8 @@ cpdef list inflation_period(Date d, Frequency frequency):
 
     return [date_from_qldate(res.first), date_from_qldate(res.second)]
 
-cpdef Time inflation_year_fraction(Frequency f, bool index_is_interpolated,
+# cpdef Time
+def inflation_year_fraction(Frequency f, bool index_is_interpolated,
                                DayCounter day_counter,
                                Date d1, Date d2):
     cdef Time t
